@@ -14,6 +14,8 @@ class PaymentServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishConfig();
+
+        $this->loadMigrationsFrom(__DIR__ . '/../Databases/migrations');
     }
 
     /**
