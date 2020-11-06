@@ -26,6 +26,18 @@ class PaymentServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfig();
+
+        $this->app->bind('payment.gateway', function ($app) {
+            switch (config('payment.default')) {
+                case 'stripe':
+                    return new \GGPHP\Payment\Gateways\Stripe\Gateway;
+                case 'paypal':
+                    return new \GGPHP\Payment\Gateways\Paypal\Gateway;
+
+                default:
+                    return null;
+            }
+        });
     }
 
     private function mergeConfig()
