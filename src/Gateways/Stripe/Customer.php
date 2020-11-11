@@ -71,25 +71,25 @@ class Customer implements CustomerInterface
      */
     public function info($properties = [])
     {
-        if (!$this->id) {
-            return null;
-        }
-
-        if (!$this->stripeCustomer) {
-            $this->stripeCustomer = StripeCustomer::retrieve($this->id);
-        }
+        $this->getStripeCustomer();
 
         if (!$this->stripeCustomer) {
             return null;
         }
 
-        $response = array_merge($this->getProperties($properties), [
+        $info = array_merge($this->getProperties($properties), [
             'id' => $this->stripeCustomer->id
         ]);
 
-        return $response;
+        return $info;
     }
 
+    /**
+     * Create customer
+     *
+     * @param  mixed $properties
+     * @return Customer
+     */
     public function create($properties = [])
     {
         $stripeCustomer = StripeCustomer::create($properties);
@@ -99,9 +99,22 @@ class Customer implements CustomerInterface
         return $this;
     }
 
+    /**
+     * Update customer
+     *
+     * @param  mixed $properties
+     * @return Customer
+     */
     public function update(array $properties = array())
     {
+        $this->getStripeCustomer();
+        foreach ($properties as $key => $value) {
+            $this->stripeCustomer->$key = $value;
+        }
 
+        $this->stripeCustomer->save();
+
+        return $this;
     }
 
     public function delete()
@@ -157,5 +170,24 @@ class Customer implements CustomerInterface
         }
 
         return $response;
+    }
+
+    /**
+     * Get Stripe customer
+     *
+     * @param  mixed $properties
+     * @return array
+     */
+    public function getStripeCustomer()
+    {
+        if (!$this->id) {
+            return null;
+        }
+
+        if (!$this->stripeCustomer) {
+            $this->stripeCustomer = StripeCustomer::retrieve($this->id);
+        }
+
+        return $this;
     }
 }

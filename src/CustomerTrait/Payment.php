@@ -34,10 +34,10 @@ class Payment
     }
 
     /**
-     * Create customer
+     * Create the customer
      *
      * @param  mixed $properties
-     * @return void
+     * @return Payment
      */
     public function create($properties = [])
     {
@@ -53,6 +53,26 @@ class Payment
         if ($customer) {
             $this->info = $customer->info($properties);
         }
+
+        return $this;
+    }
+
+    /**
+     * Update the customer
+     *
+     * @param array $properties
+     *
+     * @return Payment
+     */
+    public function update(array $properties = array())
+    {
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return $this;
+        }
+
+        $customer->update($properties);
+
+        $this->info = $customer->info($properties);
 
         return $this;
     }
