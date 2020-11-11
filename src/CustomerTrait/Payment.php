@@ -78,6 +78,27 @@ class Payment
     }
 
     /**
+     * Delete this customer
+     *
+     * @param array $properties
+     *
+     * @return Payment
+     */
+    public function delete(array $properties = array())
+    {
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return $this;
+        }
+
+        $customer->delete();
+
+        $this->model->payment_id = null;
+        $this->model->save();
+
+        return $this;
+    }
+
+    /**
      * Dynamically get values from the customer.
      *
      * @param string $key

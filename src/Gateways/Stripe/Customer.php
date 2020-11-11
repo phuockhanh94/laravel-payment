@@ -105,7 +105,7 @@ class Customer implements CustomerInterface
      * @param  mixed $properties
      * @return Customer
      */
-    public function update(array $properties = array())
+    public function update($properties = [])
     {
         $this->getStripeCustomer();
         foreach ($properties as $key => $value) {
@@ -117,10 +117,20 @@ class Customer implements CustomerInterface
         return $this;
     }
 
+    /**
+     * Delete a customer.
+     *
+     * @return Customer
+     */
     public function delete()
     {
+        $this->getStripeCustomer();
+        $this->stripeCustomer->delete();
+        $this->stripeCustomer = null;
 
+        return $this;
     }
+
     public function subscriptions()
     {
 
