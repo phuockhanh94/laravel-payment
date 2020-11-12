@@ -105,8 +105,8 @@ class Payment
      *
      * @return mixed
      */
-    public function get($key = null)
+    public function __get($key = null)
     {
-        return isset($this->info[$key]) ? $this->info[$key] : $this->info;
+        return isset($this->info[$key]) ? $this->info[$key] : null;
     }
 }

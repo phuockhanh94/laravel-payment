@@ -136,15 +136,28 @@ class Customer implements CustomerInterface
 
     }
 
+    /**
+     * cards
+     *
+     * @return void
+     */
     public function cards()
     {
 
     }
 
+    /**
+     * Get card
+     *
+     * @param  mixed $id
+     * @return void
+     */
     public function card($id = null)
     {
-
+        $this->getStripeCustomer();
+        return new Card($this->gateway,  $this->stripeCustomer, $id);
     }
+
     public function invoices()
     {
 
