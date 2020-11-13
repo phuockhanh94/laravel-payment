@@ -40,13 +40,8 @@ class Card
     public function __construct(Model $model)
     {
         $this->model = $model;
-        // $this->card = $card;
-
-        // if (empty($info)) {
-        //     $info = $card->info();
-        // }
-
-        // $this->info = $info;
+        $this->card = $this->model->gatewayCustomer();
+        $this->info = $this->customer ? $this->customer->info() : [];
     }
 
     /**
@@ -63,7 +58,7 @@ class Card
         }
         $card = $customer->card()->create($cardToken);
 
-        $this->model->billing_cards = array_merge($this->model->billing_cards, [ [$card->getId()] ]);
+        $this->model->payment_cards = array_merge($this->model->payment_cards, [ $card->getId() ]);
         $this->model->save();
 
         $this->card = $card;
@@ -82,19 +77,7 @@ class Card
     }
 
     /**
-     * Dynamically check a values existence from the creditcard.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return isset($this->info[$key]);
-    }
-
-    /**
-     * Dynamically get values from the creditcard.
+     * Dynamically get values from the card.
      *
      * @param string $key
      *

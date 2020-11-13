@@ -31,6 +31,8 @@ class Payment
     public function __construct(Model $model)
     {
         $this->model = $model;
+        $this->customer = $this->model->gatewayCustomer();
+        $this->info = $this->customer ? $this->customer->info() : [];
     }
 
     /**
@@ -42,16 +44,14 @@ class Payment
     public function create($properties = [])
     {
         // If exist customer in db, don't create new customer
-        if ($this->model->gatewayCustomer()) {
-            $customer = $this->model->gatewayCustomer();
-        } else {
-            $customer = Billing::customer()->create($properties);
-            $this->model->payment_id = $customer->getId();
+        if (!$this->customer) {
+            $this->customer = Billing::customer()->create($properties);
+            $this->model->payment_id = $this->customer->getId();
             $this->model->save();
         }
 
-        if ($customer) {
-            $this->info = $customer->info($properties);
+        if ($this->customer) {
+            $this->info = $this->customer->info();
         }
 
         return $this;
@@ -66,13 +66,13 @@ class Payment
      */
     public function update(array $properties = array())
     {
-        if (!$customer = $this->model->gatewayCustomer()) {
+        if (!$this->customer) {
             return $this;
         }
 
-        $customer->update($properties);
+        $this->customer->update($properties);
 
-        $this->info = $customer->info($properties);
+        $this->info = $this->customer->info();
 
         return $this;
     }

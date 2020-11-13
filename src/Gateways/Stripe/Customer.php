@@ -69,7 +69,7 @@ class Customer implements CustomerInterface
      *
      * @return array|null
      */
-    public function info($properties = [])
+    public function info()
     {
         $this->getStripeCustomer();
 
@@ -77,11 +77,7 @@ class Customer implements CustomerInterface
             return null;
         }
 
-        $info = array_merge($this->getProperties($properties), [
-            'id' => $this->stripeCustomer->id
-        ]);
-
-        return $info;
+        return $this->stripeCustomer->toArray();
     }
 
     /**
@@ -155,7 +151,7 @@ class Customer implements CustomerInterface
     public function card($id = null)
     {
         $this->getStripeCustomer();
-        return new Card($this->gateway,  $this->stripeCustomer, $id);
+        return new Card($this->gateway, $this->stripeCustomer, $id);
     }
 
     public function invoices()
@@ -175,24 +171,6 @@ class Customer implements CustomerInterface
     public function charge($id = null)
     {
 
-    }
-
-    /**
-     * Get Properties
-     *
-     * @param  mixed $properties
-     * @return array
-     */
-    public function getProperties($properties = [])
-    {
-        $response = [];
-        if (!empty($properties)) {
-            foreach ($properties as $property => $value) {
-                $response[$property] = isset($this->stripeCustomer->$property) ? $this->stripeCustomer->$property : null;
-            }
-        }
-
-        return $response;
     }
 
     /**
