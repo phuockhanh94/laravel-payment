@@ -9,7 +9,7 @@ trait CustomerPaymentTrait
     /**
      * Get instance CustomerBillableTrait\Billing
      *
-     * @return GGPHP\Payment\Helper\Payment
+     * @return GGPHP\Payment\CustomerTrait\Payment
      */
     public function payment()
     {
@@ -38,5 +38,39 @@ trait CustomerPaymentTrait
     public function alreadyExistPayment()
     {
         return !empty($this->payment_id);
+    }
+
+    /**
+     * Return a customer creditcards helper object.
+     *
+     * @return GGPHP\Payment\CustomerTrait\Card
+     */
+    public function card()
+    {
+        return new CustomerTrait\Card($this);
+    }
+
+    /**
+     * Getter for payment_cards property.
+     *
+     * @param string $value
+     *
+     * @return array
+     */
+    public function getPaymentCardsAttribute($value)
+    {
+        return $value ? json_decode($value, true) : array();
+    }
+
+    /**
+     * Setter for payment_cards property.
+     *
+     * @param array $value
+     *
+     * @return void
+     */
+    public function setPaymentCardsAttribute($value)
+    {
+        $this->attributes['payment_cards'] = empty($value) ? null : json_encode($value);
     }
 }
