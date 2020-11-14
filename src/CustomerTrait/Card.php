@@ -41,7 +41,7 @@ class Card
     {
         $this->model = $model;
         $this->card = $this->model->gatewayCustomer();
-        $this->info = $this->customer ? $this->customer->info() : [];
+        $this->info = $this->card ? $this->card->info() : [];
     }
 
     /**
@@ -50,7 +50,7 @@ class Card
      * @param  mixed $properties
      * @return Payment
      */
-    public function create($cardToken = [])
+    public function create($cardToken)
     {
         // If exist customer in db, don't create new customer
         if (!$customer = $this->model->gatewayCustomer()) {

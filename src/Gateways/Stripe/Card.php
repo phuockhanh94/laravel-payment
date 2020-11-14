@@ -32,6 +32,13 @@ class Card implements CardInterface
     protected $stripeCustomer;
 
     /**
+     * Stripe card object.
+     *
+     * @var Stripe_Card
+     */
+    protected $stripeCard;
+
+    /**
      * Create a new Stripe card instance.
      *
      * @param Gateway $gateway
@@ -63,6 +70,7 @@ class Card implements CardInterface
             'source' => $cardToken,
         ));
 
+        $this->stripeCard = $stripeCard;
         $this->id = $stripeCard->id;
 
         return $this;
@@ -85,7 +93,19 @@ class Card implements CardInterface
      */
     public function info()
     {
+        if (!$this->id || !$this->stripeCustomer) {
+            return null;
+        }
 
+        if (!$this->stripeCard) {
+            $this->stripeCard = $this->stripeCustomer->sources->retrieve($this->id);
+        }
+
+        if (!$this->stripeCard) {
+            return null;
+        }
+
+        return  $this->stripeCard->toArray();
     }
 
     /**
