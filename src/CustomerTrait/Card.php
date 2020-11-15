@@ -68,6 +68,29 @@ class Card
 
         return $cards;
     }
+
+    /**
+     * Get first card.
+     *
+     * @return Creditcard
+     */
+    public function first()
+    {
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return;
+        }
+
+        if (empty($this->model->payment_cards)) {
+            return null;
+        }
+
+        return new Card(
+            $this->model,
+            $customer->card($this->model->payment_cards[0]),
+            $customer->card($this->model->payment_cards[0])->info()
+        );
+    }
+
     /**
      * Create the card
      *
