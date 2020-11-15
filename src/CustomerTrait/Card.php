@@ -4,6 +4,7 @@ namespace GGPHP\Payment\CustomerTrait;
 
 use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Model;
+use GGPHP\Payment\Gateways\CardInterface;
 
 class Card
 {
@@ -17,7 +18,7 @@ class Card
     /**
      * Credit card.
      *
-     * @var \LinkThrow\Billing\Gateways\CardInterface
+     * @var \GGPHP\Payment\Gateways\CardInterface
      */
     protected $card;
 
@@ -32,18 +33,41 @@ class Card
      * Create a new CustomerBillableTrait Creditcard instance.
      *
      * @param \Illuminate\Database\Eloquent\Model    $model
-     * @param \LinkThrow\Billing\Gateways\CardInterface $card
+     * @param \GGPHP\Payment\Gateways\CardInterface $card
      * @param array                                  $info
      *
      * @return void
      */
-    public function __construct(Model $model)
+    public function __construct(Model $model, CardInterface $card = null, $info = [])
     {
         $this->model = $model;
-        $this->card = $this->model->gatewayCustomer();
-        $this->info = $this->card ? $this->card->info() : [];
+        $this->card = $card;
+        $this->info = $info;
     }
 
+    /**
+     * Get all the credit cards.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        $cards = array();
+
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return;
+        }
+
+        foreach ($this->model->payment_cards as $cardId) {
+            $cards[] = new Card(
+                $this->model,
+                $customer->card($cardId),
+                $customer->card($cardId)->info()
+            );
+        }
+
+        return $cards;
+    }
     /**
      * Create the card
      *
@@ -52,7 +76,6 @@ class Card
      */
     public function create($cardToken)
     {
-        // If exist customer in db, don't create new customer
         if (!$customer = $this->model->gatewayCustomer()) {
             return;
         }
