@@ -145,6 +145,20 @@ class Card implements CardInterface
      */
     public function delete()
     {
+        if (!$this->id || !$this->stripeCustomer) {
+            return null;
+        }
 
+        if (!$this->stripeCard) {
+            $this->stripeCard = $this->stripeCustomer->sources->retrieve($this->id);
+        }
+
+        if (!$this->stripeCard) {
+            return null;
+        }
+        $this->stripeCard->delete();
+        $this->stripeCard = null;
+
+        return $this;
     }
 }

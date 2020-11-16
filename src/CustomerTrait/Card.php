@@ -117,7 +117,7 @@ class Card
      *
      * @param array $properties
      *
-     * @return Creditcard
+     * @return Card
      */
     public function update($properties = [])
     {
@@ -127,6 +127,33 @@ class Card
 
         $this->card->update($properties);
         $this->info = $this->card->info();
+
+        return $this;
+    }
+
+    /**
+     * Delete the card
+     *
+     * @return Card
+     */
+    public function delete()
+    {
+        if (!$this->model->gatewayCustomer()) {
+            return $this;
+        }
+
+        $this->card->delete();
+
+        foreach ($cards = $this->model->payment_cards as $key => $cardId) {
+            if ($cardId == $this->id) {
+                unset($cards[$key]);
+                break;
+            }
+        }
+        $this->model->payment_cards = $cards;
+        $this->model->save();
+
+        $this->info = ['id' => $this->id];
 
         return $this;
     }
