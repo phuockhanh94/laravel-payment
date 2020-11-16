@@ -115,9 +115,27 @@ class Card implements CardInterface
      *
      * @return CardInterface
      */
-    public function update(array $properties = array())
+    public function update($properties = [])
     {
+        if (!$this->id || !$this->stripeCustomer) {
+            return null;
+        }
 
+        if (!$this->stripeCard) {
+            $this->stripeCard = $this->stripeCustomer->sources->retrieve($this->id);
+        }
+
+        if (!$this->stripeCard) {
+            return null;
+        }
+
+        foreach ($properties as $key => $value) {
+            $this->stripeCard->$key = $value;
+        }
+
+        $this->stripeCard->save();
+
+        return $this;
     }
 
     /**
