@@ -112,6 +112,25 @@ class Card
         return $this;
     }
 
+    /**
+     * Update the card
+     *
+     * @param array $properties
+     *
+     * @return Creditcard
+     */
+    public function update($properties = [])
+    {
+        if (!$this->model->gatewayCustomer()) {
+            return $this;
+        }
+
+        $this->card->update($properties);
+        $this->info = $this->card->info();
+
+        return $this;
+    }
+
      /**
      * Convert this instance to an array.
      *
