@@ -158,6 +158,36 @@ class Card
         return $this;
     }
 
+    /**
+     * Find Card.
+     *
+     * @param mixed $id
+     *
+     * @return Card
+     */
+    public function find($id)
+    {
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return;
+        }
+
+        if (empty($this->model->payment_cards)) {
+            return null;
+        }
+
+        foreach ($this->model->payment_cards as $cardId) {
+            if ($id == $cardId) {
+                return new Card(
+                    $this->model,
+                    $customer->card($this->model->payment_cards[0]),
+                    $customer->card($this->model->payment_cards[0])->info()
+                );
+            }
+        }
+
+        return null;
+    }
+
      /**
      * Convert this instance to an array.
      *
