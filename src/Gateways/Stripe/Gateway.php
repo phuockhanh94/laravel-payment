@@ -54,6 +54,10 @@ class Gateway implements GatewayInterface
 
     public function charge($id = null, CustomerInterface $customer = null)
     {
+        if ($customer) {
+            $customer = $customer->getStripeCustomer();
+        }
 
+        return new Charge($this, $customer, $id);
     }
 }

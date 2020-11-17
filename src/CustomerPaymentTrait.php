@@ -7,7 +7,7 @@ use \GGPHP\Payment\Facades\Payment as Billing;
 trait CustomerPaymentTrait
 {
     /**
-     * Get instance CustomerBillableTrait\Billing
+     * Get instance CustomerTrait\Billing
      *
      * @return GGPHP\Payment\CustomerTrait\Payment
      */
@@ -41,7 +41,7 @@ trait CustomerPaymentTrait
     }
 
     /**
-     * Return a customer creditcards helper object.
+     * Get instance CustomerTrait\Card
      *
      * @return GGPHP\Payment\CustomerTrait\Card
      */
@@ -72,5 +72,15 @@ trait CustomerPaymentTrait
     public function setPaymentCardsAttribute($value)
     {
         $this->attributes['payment_cards'] = empty($value) ? null : json_encode($value);
+    }
+
+    /**
+     * Get instance CustomerTrait\Charges
+     *
+     * @return CustomerBillableTrait\Charges
+     */
+    public function charges()
+    {
+        return new CustomerTrait\Charge($this);
     }
 }
