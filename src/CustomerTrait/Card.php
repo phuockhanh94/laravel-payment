@@ -107,6 +107,8 @@ class Card
         $this->model->payment_cards = array_merge($this->model->payment_cards, [ $card->getId() ]);
         $this->model->save();
 
+        $this->info = $card->info();
+
         $this->card = $card;
 
         return $this;

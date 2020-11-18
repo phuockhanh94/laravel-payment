@@ -189,6 +189,6 @@ class Customer implements CustomerInterface
             $this->stripeCustomer = StripeCustomer::retrieve($this->id);
         }
 
-        return $this;
+        return $this->stripeCustomer;
     }
 }
