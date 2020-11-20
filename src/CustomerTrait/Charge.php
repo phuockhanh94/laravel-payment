@@ -156,10 +156,12 @@ class Charge
      */
     public function update($properties = [])
     {
-        if ($this->charge) {
-            $this->charge->update($properties);
-            $this->info = $this->charge->info();
+        if (!$this->model->gatewayCustomer()) {
+            return;
         }
+
+        $this->charge->update($properties);
+        $this->info = $this->charge->info();
 
         return $this;
     }
@@ -171,12 +173,33 @@ class Charge
      *
      * @return Charge
      */
-    public function capture(array $properties = array())
+    public function capture(array $properties = [])
     {
-        if ($this->charge) {
-            $this->charge->capture($properties);
-            $this->info = $this->charge->info();
+        if (!$this->model->gatewayCustomer()) {
+            return;
         }
+
+        $this->charge->capture($properties);
+        $this->info = $this->charge->info();
+
+        return $this;
+    }
+
+     /**
+     * Refund charge
+     *
+     * @param array $properties
+     *
+     * @return Charge
+     */
+    public function refund($properties = [])
+    {
+        if (!$this->model->gatewayCustomer()) {
+            return;
+        }
+
+        $this->charge->refund($properties);
+        $this->info = $this->charge->info();
 
         return $this;
     }
