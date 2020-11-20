@@ -161,10 +161,18 @@ class Charge implements ChargeInterface
      *
      * @return Charge
      */
-    public function refund(array $properties = array())
+    public function refund($properties = [])
     {
+        if (!$this->getStripeCharge()) {
+            return null;
+        }
 
+        $this->stripeCharge->refunds->create($properties);
+        $this->stripeCharge = null;
+
+        return $this;
     }
+
     /**
      * Get Stripe charge
      *
