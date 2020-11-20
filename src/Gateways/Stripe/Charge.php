@@ -136,15 +136,22 @@ class Charge implements ChargeInterface
     }
 
     /**
-     * Capture a preauthorized charge.
+     * Capture a charge.
      *
      * @param array $properties
      *
      * @return Charge
      */
-    public function capture(array $properties = array())
+    public function capture($properties = [])
     {
+        if (!$this->getStripeCharge()) {
+            return null;
+        }
 
+        $this->stripeCharge->capture($properties);
+        $this->stripeCharge = null;
+
+        return $this;
     }
 
     /**
