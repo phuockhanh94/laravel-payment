@@ -52,7 +52,7 @@ class Card
      */
     public function all()
     {
-        $cards = array();
+        $cards = [];
 
         if (!$customer = $this->model->gatewayCustomer()) {
             return;

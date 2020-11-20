@@ -170,7 +170,9 @@ class Customer implements CustomerInterface
     }
     public function charge($id = null)
     {
+        $this->getStripeCustomer();
 
+        return new Charge($this->gateway, $this->stripeCustomer, $id);
     }
 
     /**

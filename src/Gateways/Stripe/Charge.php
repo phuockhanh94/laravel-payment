@@ -58,6 +58,22 @@ class Charge implements ChargeInterface
     }
 
     /**
+     * Gets list charge by Customer
+     *
+     * @return array|null
+     */
+    public function all()
+    {
+        $charges = StripeCharge::all(['customer' => $this->stripeCustomer->id]);
+
+        $chargesAray = [];
+        foreach ($charges->data as $charge) {
+            $chargesAray[] = new Charge($this->gateway, $this->stripeCustomer, $charge->id);
+        }
+
+        return $chargesAray;
+    }
+    /**
      * Gets info for a charge.
      *
      * @return array|null
@@ -87,12 +103,34 @@ class Charge implements ChargeInterface
         $properties = Arr::except($properties, ['card']);
         $charge = StripeCharge::create(array_merge($properties, [
             'amount'   => $amount,
-            'customer' => $this->stripeCustomer->id,
+            'customer' => empty($properties['customer']) ? $this->stripeCustomer->id : $properties['customer'],
             'currency' => empty($properties['currency']) ? 'usd' : $properties['currency'],
             'source'   => $card
         ]));
 
         $this->id = $charge->id;
+
+        return $this;
+    }
+
+    /**
+     * Update a charge.
+     *
+     * @param array $properties
+     *
+     * @return ChargeInterface
+     */
+    public function update($properties = [])
+    {
+        if (!$this->getStripeCharge()) {
+            return null;
+        }
+
+        foreach ($properties as $key => $value) {
+            $this->stripeCharge->$key = $value;
+        }
+
+        $this->stripeCharge->save();
 
         return $this;
     }

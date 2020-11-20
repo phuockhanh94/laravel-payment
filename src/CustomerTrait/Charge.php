@@ -66,6 +66,42 @@ class Charge
     }
 
     /**
+     * Fetch the charge.
+     *
+     * @return array
+     */
+    public function all()
+    {
+        $charges = [];
+
+        if (!$customer = $this->model->gatewayCustomer()) {
+            return;
+        }
+
+        foreach ($customer->charge()->all() as $charge) {
+            $charges[] = new Charge(
+                $this->model,
+                $charge,
+                $charge->info()
+            );
+        }
+
+        return $charges;
+    }
+
+    /**
+     * Get first charge.
+     *
+     * @return Charge
+     */
+    public function first()
+    {
+        $charges = $this->all();
+
+        return empty($charges) ? [] : $charges[0];
+    }
+
+    /**
      * Gets info for a card.
      *
      * @return array|null
@@ -105,7 +141,27 @@ class Charge
 
         $info = $charge->info();
 
-        return new Charge($this->model, $charge, $info);
+        $this->charge = $charge;
+        $this->info = $info;
+
+        return $this;
+    }
+
+    /**
+     * Update the charge
+     *
+     * @param array $properties
+     *
+     * @return Charge
+     */
+    public function update($properties = [])
+    {
+        if ($this->charge) {
+            $this->charge->update($properties);
+            $this->info = $this->charge->info();
+        }
+
+        return $this;
     }
 
     /**
