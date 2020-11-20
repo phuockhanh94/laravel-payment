@@ -165,6 +165,23 @@ class Charge
     }
 
     /**
+     * Capture charge
+     *
+     * @param array $properties
+     *
+     * @return Charge
+     */
+    public function capture(array $properties = array())
+    {
+        if ($this->charge) {
+            $this->charge->capture($properties);
+            $this->info = $this->charge->info();
+        }
+
+        return $this;
+    }
+
+    /**
      * Get card token
      *
      * @param string $cardToken
