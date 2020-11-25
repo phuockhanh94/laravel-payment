@@ -1,5 +1,5 @@
 {
-    "name": "ggphplaravel-payment",
+    "name": "ggphp/laravel-payment",
     "description": "Package payment for Laravel",
     "license": "MIT",
 
