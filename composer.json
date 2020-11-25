@@ -1,0 +1,32 @@
+{
+    "name": "ggphplaravel-payment",
+    "description": "Package payment for Laravel",
+    "license": "MIT",
+
+    "authors": [
+        {
+            "name": "phuockhanh94",
+            "email": "lephuockhanh94@gmail.com"
+        }
+    ],
+
+    "require": {
+        "stripe/stripe-php": "^7.61"
+    },
+    "autoload": {
+        "psr-4": {
+            "GGPHP\\Payment\\": "src/"
+        }
+    },
+
+    "extra": {
+        "laravel": {
+            "providers": [
+                "GGPHP\\Payment\\Providers\\PaymentServiceProvider"
+            ],
+            "aliases": {}
+        }
+    },
+
+    "minimum-stability": "dev"
+}
