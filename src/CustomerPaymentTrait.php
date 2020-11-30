@@ -51,6 +51,18 @@ trait CustomerPaymentTrait
     }
 
     /**
+     * Return a customer subscriptions helper object.
+     *
+     * @param mixed $plan
+     *
+     * @return CustomerBillableTrait\Subscriptions
+     */
+    public function subscriptions($plan = null)
+    {
+        return new CustomeTrait\Subscriptions($this, $plan);
+    }
+
+    /**
      * Getter for payment_cards property.
      *
      * @param string $value
@@ -59,7 +71,7 @@ trait CustomerPaymentTrait
      */
     public function getPaymentCardsAttribute($value)
     {
-        return $value ? json_decode($value, true) : array();
+        return $value ? json_decode($value, true) : [];
     }
 
     /**

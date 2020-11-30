@@ -49,7 +49,7 @@ class Gateway implements GatewayInterface
      */
     public function subscription($id = null, CustomerInterface $customer = null)
     {
-        return new Subscription($this, $id);
+        return new Subscription($this, $customer, $id);
     }
 
     public function charge($id = null, CustomerInterface $customer = null)
