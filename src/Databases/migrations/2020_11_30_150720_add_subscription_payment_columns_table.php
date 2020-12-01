@@ -15,6 +15,7 @@ class AddSubscriptionPaymentColumnsTable extends Migration
     {
         Schema::table(config('payment.subscription_table'), function(Blueprint $table)
         {
+            $table->integer('user_id');
             $table->tinyInteger('payment_active')->default(0);
             $table->string('payment_subscription_id')->nullable();
             $table->tinyInteger('payment_free')->default(0);
@@ -36,7 +37,7 @@ class AddSubscriptionPaymentColumnsTable extends Migration
      */
     public function down()
     {
-        Schema::table('subscription_table', function(Blueprint $table)
+        Schema::table(config('payment.subscription_table'), function(Blueprint $table)
         {
             $table->dropColumn(
                 'payment_active', 'payment_subscription_id', 'payment_free', 'payment_plan', 'payment_amount',

@@ -97,12 +97,6 @@ class Subscription
      */
     public function create(array $properties = array())
     {
-        if ($this->isFree || $this->canLocalTrial()) {
-            return $this->storeLocal(array(
-                'quantity' => Arr::get($properties, 'quantity', 1),
-            ));
-        }
-
         if ($this->model->billingIsActive()) {
             return $this;
         }

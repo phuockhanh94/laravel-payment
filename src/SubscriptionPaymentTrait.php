@@ -14,15 +14,15 @@ trait SubscriptionPaymentTrait
      */
     public function gatewaySubscription()
     {
-        if (!$this->everSubscribed()) {
+        if (!$this->alreadySubscribed()) {
             return null;
         }
 
-        if ($customer = $this->customer()) {
+        if ($customer = $this->getCustomer()) {
             $customer = $customer->gatewayCustomer();
         }
 
-        return Billing::subscription($this->billing_subscription, $customer);
+        return Billing::subscription($this->payment_subscription_id, $customer);
     }
 
     /**
@@ -34,6 +34,30 @@ trait SubscriptionPaymentTrait
      */
     public function subscription($plan = null)
     {
-        return new SubscriptionBillableTrait\Subscription($this, $plan);
+        return new SubscriptionTrait\Subscription($this, $plan);
+    }
+
+     /**
+     * Determine if the entity is a Billing customer.
+     *
+     * @return bool
+     */
+    public function alreadySubscribed()
+    {
+        return !empty($this->payment_subscription_id);
+    }
+
+    /**
+     * The method customer define relationship between customer & subscription
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getCustomer()
+    {
+        if (method_exists($this, 'customer')) {
+            return $this->customer();
+        }
+
+        return null;
     }
 }

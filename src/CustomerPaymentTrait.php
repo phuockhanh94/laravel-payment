@@ -30,7 +30,7 @@ trait CustomerPaymentTrait
         return Billing::customer($this->payment_id);
     }
 
-     /**
+    /**
      * Determine if the entity is a Billing customer.
      *
      * @return bool

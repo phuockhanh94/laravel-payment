@@ -97,7 +97,7 @@ class Subscriptions
      */
     public function create($properties = [])
     {
-        $subscription = $model->subscription($this->plan);
+        $subscription = $this->subscription($this->plan);
 
         if ($this->card_token) {
             $subscription->withCardToken($this->card_token);
