@@ -16,12 +16,25 @@ composer require ggphp/laravel-payment
 Publish the default config file `payment.php` to your application
 
 ```console
-php artisan config:publish linkthrow/laravel-billing
+php artisan config:publish --force
 ```
+Then choose `payment-config`
 #### Run Migrations
 
 ```console
 php artisan migrate
+```
+#### Customer Model Setup
+
+Next, add the CustomerBillableTrait to your customer model definition:
+
+```php
+use GGPHP\Payment\CustomerPaymentTrait;
+
+class User extends Eloquent
+{
+  use CustomerPaymentTrait;
+}
 ```
 ## Customers
 
