@@ -64,7 +64,7 @@ class Payment
      *
      * @return Payment
      */
-    public function update(array $properties = array())
+    public function update($properties = [])
     {
         if (!$this->customer) {
             return $this;
@@ -84,7 +84,7 @@ class Payment
      *
      * @return Payment
      */
-    public function delete(array $properties = array())
+    public function delete($properties = [])
     {
         if (!$customer = $this->model->gatewayCustomer()) {
             return $this;

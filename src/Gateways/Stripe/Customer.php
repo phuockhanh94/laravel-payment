@@ -91,6 +91,8 @@ class Customer implements CustomerInterface
         $stripeCustomer = StripeCustomer::create($properties);
 
         $this->id = $stripeCustomer->id;
+        $c = $this->getStripeCustomer();
+        dd($c->sources->data);
 
         return $this;
     }
@@ -139,7 +141,8 @@ class Customer implements CustomerInterface
      */
     public function cards()
     {
-
+        $cards = $this->stripeCustomer->sources->data;
+        dd($cards);
     }
 
     /**
