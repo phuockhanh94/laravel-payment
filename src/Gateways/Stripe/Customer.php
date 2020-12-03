@@ -91,8 +91,6 @@ class Customer implements CustomerInterface
         $stripeCustomer = StripeCustomer::create($properties);
 
         $this->id = $stripeCustomer->id;
-        $c = $this->getStripeCustomer();
-        dd($c->sources->data);
 
         return $this;
     }
@@ -141,8 +139,13 @@ class Customer implements CustomerInterface
      */
     public function cards()
     {
+        if (!$this->stripeCustomer) {
+            return null;
+        }
+
         $cards = $this->stripeCustomer->sources->data;
-        dd($cards);
+
+        return $cards;
     }
 
     /**
@@ -154,6 +157,10 @@ class Customer implements CustomerInterface
     public function card($id = null)
     {
         $this->getStripeCustomer();
+        if (!$this->stripeCustomer) {
+            return null;
+        }
+
         return new Card($this->gateway, $this->stripeCustomer, $id);
     }
 
