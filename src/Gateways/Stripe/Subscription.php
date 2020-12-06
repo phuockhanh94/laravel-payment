@@ -8,7 +8,7 @@ use GGPHP\Payment\Gateways\GatewayInterface;
 
 class Subscription
 {
-     /**
+    /**
      * The gateway instance.
      *
      * @var gateway
@@ -22,12 +22,19 @@ class Subscription
      */
     protected $id;
 
-     /**
+    /**
      * Stripe customer object.
      *
      * @var StripeCustomer
      */
     protected $stripeCustomer;
+
+    /**
+     * Stripe subscription object.
+     *
+     * @var StripeCustomer
+     */
+    protected $stripeSubscription;
 
     /**
      * Create a new instance.
@@ -45,6 +52,39 @@ class Subscription
     }
 
     /**
+     * Get id for a subscription.
+     *
+     * @return void
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+
+    /**
+     * Gets info for a subscription.
+     *
+     * @return array|null
+     */
+    public function info()
+    {
+        if (!$this->id || !$this->stripeCustomer) {
+            return null;
+        }
+
+        if (!$this->stripeSubscription) {
+            $this->stripeSubscription = $this->stripeCustomer->subscriptions->retrieve($this->id);
+        }
+
+        if (!$this->stripeSubscription) {
+            return null;
+        }
+
+        return $this->stripeSubscription->toArray();
+    }
+
+    /**
      * Create a new subscription.
      *
      * @param mixed $plan
@@ -54,42 +94,38 @@ class Subscription
      */
     public function create($plan, $properties = [])
     {
-        $trial_end = null;
+        $trialEnd = null;
 
         if (!empty($properties['trial_end'])) {
-            $trial_end = strtotime($properties['trial_end']);
-            if ($trial_end <= time()) {
-                $trial_end = 'now';
+            $trialEnd = strtotime($properties['trial_end']);
+            if ($trialEnd <= time()) {
+                $trialEnd = 'now';
             }
         }
 
-        // Note: Stripe does not yet support specifying an existing card for a subscription.
-        // This feature is coming in a future relase, however.
-        // Currently you can only specify a card token and the same card is used for all
-        // customer subscriptions.
-        $stripe_subscriptions = $this->stripeCustomer->subscriptions;
+        $stripeSubscriptions = $this->stripeCustomer->subscriptions;
 
-        if ( ! $stripe_subscriptions) {
+        if ( ! $stripeSubscriptions) {
             throw new \Exception("Stripe Customer does not exist.");
         }
 
-        $stripe_subscription = $stripe_subscriptions->create(array(
-            // 'plan'      => $plan,
+        $stripeSubscription = $stripeSubscriptions->create([
             'items' => [
                 [
                     'price' => $plan,
-                    'quantity'  => $properties['quantity'] ? $properties['quantity'] : null,
+                    'quantity'  => isset($properties['quantity']) ? $properties['quantity'] : null,
+                    'tax_rates'  => isset($properties['tax_rates']) ? $properties['tax_rates'] : null,
                 ]
             ],
+            'trial_end' => $trialEnd,
+            'coupon'    => isset($properties['coupon']) ? $properties['coupon'] : null,
+            'source'    => isset($properties['card_token']) ? $properties['card_token'] : null,
+        ]);
 
-            'trial_end' => 'now',
-            'coupon'    => $properties['coupon'] ? $properties['coupon'] : null,
-            // 'source'    => $properties['card_token'] ? $properties['card_token'] : null,
-        ));
-        dd($stripe_subscription);
-
-        $this->id = $stripe_subscription->id;
+        dd($stripeSubscription);
+        $this->stripeSubscription = $stripeSubscription;
+        $this->id = $stripeSubscription->id;
 
         return $this;
-   }
+    }
 }

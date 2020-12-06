@@ -63,14 +63,7 @@ class Subscriptions
      *
      * @var bool
      */
-    protected $skip_trial;
-
-    /**
-     * Whether or not this subscription should be free (not stored in billing gateway).
-     *
-     * @var bool
-     */
-    protected $is_free;
+    protected $skipTrial;
 
     /**
      * Create a new CustomerBillableTrait Subscriptions instance.
@@ -92,74 +85,47 @@ class Subscriptions
      * @param \Illuminate\Database\Eloquent\Model $model
      * @param array                               $properties
      *
-     * @return \LinkThrow\Billing\SubscriptionBillableTrait\Subscription
+     * @return GGPHP\Payment\CustomerTrait\Subscription
      */
     public function create($properties = [])
     {
-        // $subscription = $this->subscription($this->plan);
-
-        // if ($this->card_token) {
-        //     $subscription->withCardToken($this->card_token);
-        // }
-        // if ($this->card) {
-        //     $subscription->withCard($this->card);
-        // }
-        // if ($this->coupon) {
-        //     $subscription->withCoupon($this->coupon);
-        // }
-        // if ($this->skip_trial) {
-        //     $subscription->skipTrial();
-        // }
-        // if ($this->is_free) {
-        //     $subscription->isFree();
-        // }
-
-        // if (!$customer = $this->model->gatewayCustomer()) {
-        //     return;
-        // }
-        // dd($this->model->alreadyExistPayment());
-            // Check exist customer stripe
-
-        if (!$customer = $this->model->gatewayCustomer()) {
-            // if ($this->cardToken) {
-            //     $customer->payment()->withCardToken($this->cardToken)->create($properties);
-            // } else {
-                $customer = $this->model->payment()->create($properties);
-            // }
+        if (!$this->model->alreadyExistPayment()) {
+            $this->model->payment()->create();
         }
+
         if ($this->cardToken) {
-                $this->card = $customer->creditcards()->create($this->cardToken)->id;
-                $this->cardToken = null;
-            }
-        // dd(1, $customer->getStripeCustomer());
-        $this->subscription = Billing::subscription(null, $customer ? $customer : null)
-        ->create($this->plan, array_merge($properties, array(
-            'trial_end' => $this->skip_trial ? date('Y-m-d H:i:s') : (isset($properties['trial_end']) ? $properties['trial_end'] : null),
+            $this->card = $this->model->card()->create($this->cardToken)->id;
+            $this->cardToken = null;
+        }
+        $this->subscription = Billing::subscription(null, $this->model->gatewayCustomer())
+        ->create($this->plan, array_merge($properties, [
+            'trial_end' => $this->skipTrial ? date('Y-m-d H:i:s') : (isset($properties['trial_end']) ? $properties['trial_end'] : null),
             'coupon'        => $this->coupon,
             'quantity'      => isset($properties['quantity']) ? $properties['quantity'] : 1,
-            'card_token1'    => $this->cardToken,
-            'card1'          => $this->card,
-        )));
+            'card_token'    => $this->cardToken,
+            'card'          => $this->card,
+        ]));
 
-            // $this->model->billing_active = 1;
-            // $this->model->billing_subscription = $this->subscription->id();
-            // $this->model->billing_free = 0;
-            // $this->model->billing_plan = $info['plan'];
-            // $this->model->billing_amount = $info['amount'];
-            // $this->model->billing_interval = $info['interval'];
-            // $this->model->billing_quantity = $info['quantity'];
-            // $this->model->billing_card = $info['card'];
-            // $this->model->billing_trial_ends_at = $info['trial_ends_at'];
-            // $this->model->billing_subscription_ends_at = $info['period_ends_at'];
-            // $this->model->billing_subscription_discounts = $info['discounts'];
+        $info = $this->subscription->info();
+        $active = $info['status'] != 'canceled' && !$info['cancel_at_period_end'];
 
-            // if (!$info['active']) {
-            //     $this->model->billing_active = 0;
-            //     $this->model->billing_trial_ends_at = null;
-            // }
+        if (method_exists($this->model, 'subscriptionsModel')) {
+            $this->model->subscriptionsModel()->create([
+                'payment_active' => $active ? 1 : 0,
+                'payment_subscription_id' => $this->subscription->getId(),
+                'payment_free' => 0,
+                'payment_plan' => $info['plan']['id'],
+                'payment_amount' => $info['plan']['amount'],
+                'payment_interval' => $info['plan']['interval'],
+                'payment_quantity' => $info['quantity'],
+                'payment_card' => $info['default_source'],
+                'payment_trial_ends_at' => $active && $info['trial_end'] ? date('Y-m-d H:i:s', $info['trial_end']) : null,
+                'payment_subscription_ends_at' => date('Y-m-d H:i:s', $info['current_period_end']),
+                'payment_subscription_discounts' => json_encode($info['discount']),
+            ]);
+        }
 
-
-        // return $subscription->create($properties);
+        return $this;
     }
 
     /**
@@ -182,9 +148,9 @@ class Subscriptions
      *
      * @return Subscriptions
      */
-    public function withCardToken($card_token)
+    public function withCardToken($cardToken)
     {
-        $this->card_token = $card_token;
+        $this->cardToken = $cardToken;
         return $this;
     }
 
@@ -208,18 +174,7 @@ class Subscriptions
      */
     public function skipTrial()
     {
-        $this->skip_trial = true;
-        return $this;
-    }
-
-    /**
-     * Indicate that this subscription should be free and not stored in the billing gateway.
-     *
-     * @return Subscriptions
-     */
-    public function isFree()
-    {
-        $this->is_free = true;
+        $this->skipTrial = true;
         return $this;
     }
 }
