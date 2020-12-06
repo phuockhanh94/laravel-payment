@@ -49,6 +49,10 @@ class Gateway implements GatewayInterface
      */
     public function subscription($id = null, CustomerInterface $customer = null)
     {
+        if ($customer) {
+            $customer = $customer->getStripeCustomer();
+        }
+
         return new Subscription($this, $customer, $id);
     }
 

@@ -99,6 +99,20 @@ class Payment
     }
 
     /**
+     * The credit card token to assign to a new customer.
+     *
+     * @param string $card_token
+     *
+     * @return Payment
+     */
+    public function withCardToken($cardToken)
+    {
+        $this->cardToken = $cardToken;
+
+        return $this;
+    }
+
+    /**
      * Dynamically get values from the customer.
      *
      * @param string $key

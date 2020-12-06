@@ -49,7 +49,7 @@ class PaymentServiceProvider extends ServiceProvider
     private function publishConfig()
     {
         $path = $this->getConfigPath();
-        $this->publishes([$path => config_path('payment.php')], 'config');
+        $this->publishes([$path => config_path('payment.php')], 'payment-config');
     }
 
     private function getConfigPath()

@@ -59,7 +59,7 @@ trait CustomerPaymentTrait
      */
     public function subscriptions($plan = null)
     {
-        return new CustomeTrait\Subscriptions($this, $plan);
+        return new CustomerTrait\Subscriptions($this, $plan);
     }
 
     /**
